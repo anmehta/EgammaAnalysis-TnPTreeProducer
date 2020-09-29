@@ -45,19 +45,22 @@ def leptonMvaSequence(process, options, tnpVars):
       leptonMva_sequence += cms.Sequence(getattr(process, name))
 
     makeIsoForEle(leptonMva_sequence, 'isoForEleFall17',   'RecoEgamma/ElectronIdentification/data/Fall17/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt')
-    makeIsoForEle(leptonMva_sequence, 'isoForEleSummer16', 'RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt')
+    makeIsoForEle(leptonMva_sequence, 'isoForEleSummer16', 'RecoEgamma/ElectronIdentification/data/Fall17/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt')
+    #RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt')
     makeIsoForEle(leptonMva_sequence, 'isoForEleSpring15', 'RecoEgamma/ElectronIdentification/data/Spring15/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_25ns.txt')
+
 
     #
     # Calculate the lepton mva's
     #   (at some point we can clean up the older TTH and Ghent ones, keeping only the TOP)
-    #
+    #https://github.com/cms-data/PhysicsTools-NanoAOD
     process.leptonMvaTTH = cms.EDProducer('LeptonMvaProducer',
       leptonMvaType        = cms.string("leptonMvaTTH"),
-      weightFile           = cms.FileInPath('EgammaAnalysis/TnPTreeProducer/data/el_ttH%s_BDTG.weights.xml' % ('16' if '2016' in options['era'] else '17')),
+      weightFile           = cms.FileInPath('EgammaAnalysis/TnPTreeProducer/data/el_BDTG_20%s.weights.xml' % ('16' if '2016' in options['era'] else '17')),
       probes               = cms.InputTag('slimmedElectrons'),
-      miniIsoChg           = cms.InputTag('isoForEle%s:miniIsoChg' % ('Spring15' if '2016' in options['era'] else 'Fall17')),
-      miniIsoAll           = cms.InputTag('isoForEle%s:miniIsoAll' % ('Spring15' if '2016' in options['era'] else 'Fall17')),
+      miniIsoChg           = cms.InputTag('isoForEle%s:miniIsoChg' % ('Spring15'  if '2016' in options['era'] else 'Fall17')),
+      miniIsoAll           = cms.InputTag('isoForEle%s:miniIsoAll' % ('Spring15'  if '2016' in options['era'] else 'Fall17')),
+      PFIsoAll04           = cms.InputTag('isoForEle%s:PFIsoAll04' % ('Summer16'  if '2016' in options['era'] else 'Fall17')),
       ptRatio              = cms.InputTag('ptRatioRelForEle:ptRatio'),
       ptRel                = cms.InputTag('ptRatioRelForEle:ptRel'),
       jetNDauChargedMVASel = cms.InputTag('ptRatioRelForEle:jetNDauChargedMVASel'),

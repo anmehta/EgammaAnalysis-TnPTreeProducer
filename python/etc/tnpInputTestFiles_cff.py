@@ -13,7 +13,8 @@ filesMiniAOD_2017 = {
 }
 
 filesMiniAOD_2016 = {
-    'mc' :   cms.untracked.vstring('file:/eos/cms/store/group/phys_egamma/tnpTuples/testFiles/RunIISummer16MiniAODv3-DYJetsToLL_M-50.root'),
+    #'mc' :   cms.untracked.vstring('file:/eos/cms/store/group/phys_egamma/tnpTuples/testFiles/RunIISummer16MiniAODv3-DYJetsToLL_M-50.root'),
+    'mc' :   cms.untracked.vstring('file:/eos/cms/store/cmst3/group/dpsww/DYJetsToLL_M-50_TuneCUETP8M1_madgraphMLM-p8_Summer16MiniAODv3.root'),
     'data' : cms.untracked.vstring('file:/eos/cms/store/group/phys_egamma/tnpTuples/testFiles/SingleElectron-Run2016B-17Jul2018_ver2-v1.root'),
 }
 

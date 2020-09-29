@@ -139,20 +139,24 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
       deepCsv = std::isnan(probb+probbb) ? 0. :  std::max(probb+probbb, (float)0.);
     }
 
+
     // If you need a new leptonMvaType, you can implement the mapping of the variables here:
+    // https://github.com/cms-sw/cmssw/blob/CMSSW_10_2_X/PhysicsTools/NanoAOD/python/electrons_cff.py#L285-#L303
     if(leptonMvaType_=="leptonMvaTTH"){
       inputValues["LepGood_pt"]                   = pp->pt();
       inputValues["LepGood_eta"]                  = pp->eta();
       inputValues["LepGood_jetNDauChargedMVASel"] = floats["jetNDauChargedMVASel"];
-      inputValues["LepGood_miniRelIsoCharged"]    = floats["miniIsoChg"];
-      inputValues["LepGood_miniRelIsoNeutral"]    = floats["miniIsoAll"] - floats["miniIsoChg"];
-      inputValues["LepGood_jetPtRelv2"]           = floats["ptRel"];
+      inputValues["LepGood_miniRelIsoCharged"]    = floats["miniIsoChg"]/pp->pt();
+      inputValues["LepGood_miniRelIsoNeutral"]    = (floats["miniIsoAll"] - floats["miniIsoChg"])/pp->pt();
+      inputValues["LepGood_jetPtRelv2"]           = std::isnan(floats["ptRel"] ? (float)0. : floats["ptRel"]);
       inputValues["LepGood_jetDF"]                = deepFlavour;
-      inputValues["LepGood_jetPtRatio"]           = std::min(floats["ptRatio"],(float)1.5);
+      inputValues["LepGood_jetPtRatio"]           = std::isnan(floats["ptRatio"]) ? 1.0/(1.0+floats["PFIsoAll04"]/pp->pt()) : std::min(floats["ptRatio"],(float)1.5);
       inputValues["LepGood_dxy"]                  = log(fabs(probe.dB(pat::Electron::PV2D)));
       inputValues["LepGood_sip3d"]                = fabs(probe.dB(pat::Electron::PV3D)/probe.edB(pat::Electron::PV3D));
       inputValues["LepGood_dz"]                   = log(fabs(probe.dB(pat::Electron::PVDZ)));
       inputValues["LepGood_mvaFall17V2noIso"]     = floats["mvas"];
+
+
     } else if(leptonMvaType_=="leptonMvaGhent"){
       inputValues["pt"]                     = pp->pt();
       inputValues["eta"]                    = fabs(pp->eta());
