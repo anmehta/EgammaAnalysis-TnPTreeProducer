@@ -45,8 +45,7 @@ def leptonMvaSequence(process, options, tnpVars):
       leptonMva_sequence += cms.Sequence(getattr(process, name))
 
     makeIsoForEle(leptonMva_sequence, 'isoForEleFall17',   'RecoEgamma/ElectronIdentification/data/Fall17/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt')
-    makeIsoForEle(leptonMva_sequence, 'isoForEleSummer16', 'RecoEgamma/ElectronIdentification/data/Fall17/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_94X.txt')
-    #RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt')
+    makeIsoForEle(leptonMva_sequence, 'isoForEleSummer16', 'RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt')
     makeIsoForEle(leptonMva_sequence, 'isoForEleSpring15', 'RecoEgamma/ElectronIdentification/data/Spring15/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_25ns.txt')
 
 

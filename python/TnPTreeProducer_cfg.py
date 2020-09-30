@@ -21,15 +21,15 @@ registerOption('isMC',        False,    'Use MC instead of data')
 registerOption('isAOD',       False,    'Use AOD samples instead of miniAOD')
 registerOption('is80X',       False,    'Compatibility to run on old 80X files')
 registerOption('doEleID',     True,     'Include tree for electron ID SF')
-registerOption('doPhoID',     True,     'Include tree for photon ID SF')
-registerOption('doTrigger',   True,     'Include tree for trigger SF')
+registerOption('doPhoID',     False,     'Include tree for photon ID SF')
+registerOption('doTrigger',   False,     'Include tree for trigger SF')
 registerOption('doRECO',      False,    'Include tree for Reco SF (requires AOD)')
 registerOption('calibEn',     False,    'Use EGM smearer to calibrate photon and electron energy')
 registerOption('includeSUSY', False,    'Add also the variables used by SUSY')
 
 registerOption('HLTname',     'HLT',    'HLT process name (default HLT)', optionType=VarParsing.varType.string) # HLTname was HLT2 in now outdated reHLT samples
 registerOption('GT',          'auto',   'Global Tag to be used', optionType=VarParsing.varType.string)
-registerOption('era',         '2018',   'Data-taking era: 2016, 2017, 2018, UL2017 or UL2018', optionType=VarParsing.varType.string)
+registerOption('era',         '2016',   'Data-taking era: 2016, 2017, 2018, UL2017 or UL2018', optionType=VarParsing.varType.string)
 registerOption('logLevel',    'INFO',   'Loglevel: could be DEBUG, INFO, WARNING, ERROR', optionType=VarParsing.varType.string)
 
 registerOption('L1Threshold',  0,       'Threshold for L1 matched objects', optionType=VarParsing.varType.int)
@@ -73,12 +73,12 @@ options['ELECTRON_COLL']        = "gedGsfElectrons" if options['useAOD'] else "s
 options['PHOTON_COLL']          = "gedPhotons" if options['useAOD'] else "slimmedPhotons"
 options['SUPERCLUSTER_COLL']    = "reducedEgamma:reducedSuperClusters" ### not used in AOD
 
-options['ELECTRON_CUTS']        = "ecalEnergy*sin(superClusterPosition.theta)>5.0 &&  (abs(-log(tan(superClusterPosition.theta/2)))<2.5)"
-options['SUPERCLUSTER_CUTS']    = "abs(eta)<2.5 &&  et>5.0"
+options['ELECTRON_CUTS']        = "" #ecalEnergy*sin(superClusterPosition.theta)>5.0 &&  (abs(-log(tan(superClusterPosition.theta/2)))<2.5)"
+options['SUPERCLUSTER_CUTS']    = "" #abs(eta)<2.5 &&  et>5.0"
 options['PHOTON_CUTS']          = "(abs(-log(tan(superCluster.position.theta/2)))<=2.5) && pt> 10"
-options['ELECTRON_TAG_CUTS']    = "(abs(-log(tan(superCluster.position.theta/2)))<=2.1) && !(1.4442<=abs(-log(tan(superClusterPosition.theta/2)))<=1.566) && pt >= 30.0"
+options['ELECTRON_TAG_CUTS']    = "" #(abs(-log(tan(superCluster.position.theta/2)))<=2.1) && !(1.4442<=abs(-log(tan(superClusterPosition.theta/2)))<=1.566) && pt >= 30.0"
 
-options['MAXEVENTS']            = cms.untracked.int32(varOptions.maxEvents)
+options['MAXEVENTS']            = cms.untracked.int32(200)#varOptions.maxEvents)
 options['DoTrigger']            = varOptions.doTrigger
 options['DoRECO']               = varOptions.doRECO
 options['DoEleID']              = varOptions.doEleID
