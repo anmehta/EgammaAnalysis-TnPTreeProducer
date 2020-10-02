@@ -17,14 +17,14 @@ def registerOption(optionName, defaultValue, description, optionType=VarParsing.
       description
   )
 
-registerOption('isMC',        False,    'Use MC instead of data')
+registerOption('isMC',        True,    'Use MC instead of data')
 registerOption('isAOD',       False,    'Use AOD samples instead of miniAOD')
 registerOption('is80X',       False,    'Compatibility to run on old 80X files')
 registerOption('doEleID',     True,     'Include tree for electron ID SF')
 registerOption('doPhoID',     False,     'Include tree for photon ID SF')
 registerOption('doTrigger',   False,     'Include tree for trigger SF')
 registerOption('doRECO',      False,    'Include tree for Reco SF (requires AOD)')
-registerOption('calibEn',     False,    'Use EGM smearer to calibrate photon and electron energy')
+registerOption('calibEn',     True,    'Use EGM smearer to calibrate photon and electron energy')
 registerOption('includeSUSY', False,    'Add also the variables used by SUSY')
 
 registerOption('HLTname',     'HLT',    'HLT process name (default HLT)', optionType=VarParsing.varType.string) # HLTname was HLT2 in now outdated reHLT samples
@@ -78,7 +78,7 @@ options['SUPERCLUSTER_CUTS']    = "" #abs(eta)<2.5 &&  et>5.0"
 options['PHOTON_CUTS']          = "(abs(-log(tan(superCluster.position.theta/2)))<=2.5) && pt> 10"
 options['ELECTRON_TAG_CUTS']    = "" #(abs(-log(tan(superCluster.position.theta/2)))<=2.1) && !(1.4442<=abs(-log(tan(superClusterPosition.theta/2)))<=1.566) && pt >= 30.0"
 
-options['MAXEVENTS']            = cms.untracked.int32(200)#varOptions.maxEvents)
+options['MAXEVENTS']            = cms.untracked.int32(20)#varOptions.maxEvents)
 options['DoTrigger']            = varOptions.doTrigger
 options['DoRECO']               = varOptions.doRECO
 options['DoEleID']              = varOptions.doEleID
@@ -96,13 +96,13 @@ options['OUTPUT_FILE_NAME']     = "TnPTree_%s.root" % ("mc" if options['isMC'] e
 #################################################
 if varOptions.GT == "auto":
   if options['isMC']:
-    if options['era'] == '2016':   options['GLOBALTAG'] = '94X_mcRun2_asymptotic_v3'
+    if options['era'] == '2016':   options['GLOBALTAG'] = '102X_mcRun2_asymptotic_v8' #94X_mcRun2_asymptotic_v3'
     if options['era'] == '2017':   options['GLOBALTAG'] = '94X_mc2017_realistic_v17'
     if options['era'] == '2018':   options['GLOBALTAG'] = '102X_upgrade2018_realistic_v21'
     if options['era'] == 'UL2017': options['GLOBALTAG'] = '106X_dataRun2_v28'
     if options['era'] == 'UL2018': options['GLOBALTAG'] = '106X_dataRun2_v28'
   else:
-    if options['era'] == '2016':   options['GLOBALTAG'] = '94X_dataRun2_v10'
+    if options['era'] == '2016':   options['GLOBALTAG'] = '102X_mcRun2_asymptotic_v8'
     if options['era'] == '2017':   options['GLOBALTAG'] = '94X_dataRun2_v11'
     if options['era'] == '2018':   options['GLOBALTAG'] = '102X_dataRun2_v13'
     if options['era'] == 'UL2017': options['GLOBALTAG'] = '106X_mc2017_realistic_v7'
@@ -207,7 +207,7 @@ if not options['useAOD']:
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 process.MessageLogger.cerr.threshold = ''
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.source = cms.Source("PoolSource", fileNames = options['INPUT_FILE_NAME'])
 process.maxEvents = cms.untracked.PSet( input = options['MAXEVENTS'])

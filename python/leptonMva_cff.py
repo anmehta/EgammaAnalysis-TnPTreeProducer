@@ -12,18 +12,17 @@ def leptonMvaSequence(process, options, tnpVars):
     else:                jetCorrectorLevels = ['L1FastJet', 'L2Relative', 'L3Absolute','L2L3Residual']
 
     from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
+    
     updateJetCollection(
        process,
        jetSource = cms.InputTag('slimmedJets'),
        labelName = 'Updated',
        jetCorrections = ('AK4PFchs', cms.vstring(jetCorrectorLevels), 'None'),
        btagDiscriminators = [
-      # 'pfDeepCSVJetTags:probb', # ghent lepton mva uses older version of pfDeepCSV it seems, so do not re-run these
-      # 'pfDeepCSVJetTags:probbb',
         'pfDeepFlavourJetTags:probb',
         'pfDeepFlavourJetTags:probbb',
         'pfDeepFlavourJetTags:problepb',
-       ],
+        ],
     )
     leptonMva_sequence = cms.Sequence(process.patAlgosToolsTask)
 
@@ -65,7 +64,7 @@ def leptonMvaSequence(process, options, tnpVars):
       jetNDauChargedMVASel = cms.InputTag('ptRatioRelForEle:jetNDauChargedMVASel'),
       closestJet           = cms.InputTag('ptRatioRelForEle:jetForLepJetVar'),
       mvas                 = cms.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV2Values'),
-      debug                = cms.bool(False), # set to True if you want to sync with your analysis
+      debug                = cms.bool(True), # set to True if you want to sync with your analysis
     )
 
     process.leptonMvaGhent = cms.EDProducer('LeptonMvaProducer',
@@ -99,9 +98,9 @@ def leptonMvaSequence(process, options, tnpVars):
     )
 
     leptonMva_sequence += cms.Sequence(
-      process.leptonMvaTTH +
-      process.leptonMvaGhent +
-      process.leptonMvaTOP
+      process.leptonMvaTTH #+
+      #process.leptonMvaGhent +
+      #process.leptonMvaTOP
     )
 
     #
@@ -110,15 +109,22 @@ def leptonMvaSequence(process, options, tnpVars):
     #
     newVariables = {
       'el_leptonMva_ttH'         : cms.InputTag('leptonMvaTTH:leptonMvaTTH'),
-      'el_leptonMva_ghent'       : cms.InputTag('leptonMvaGhent:leptonMvaGhent'),
-      'el_leptonMva_TOP'         : cms.InputTag('leptonMvaTOP:leptonMvaTOP'),
+      #'el_leptonMva_ghent'       : cms.InputTag('leptonMvaGhent:leptonMvaGhent'),
+      #'el_leptonMva_TOP'         : cms.InputTag('leptonMvaTOP:leptonMvaTOP'),
       'el_miniIsoAll_fall17'     : cms.InputTag('isoForEleFall17:miniIsoAll'),
       'el_miniIsoChg_fall17'     : cms.InputTag('isoForEleFall17:miniIsoChg'),
+      'el_miniIsoAll_Spring15'     : cms.InputTag('isoForEleSpring15:miniIsoAll'),
+      'el_miniIsoChg_Spring15'     : cms.InputTag('isoForEleSpring15:miniIsoChg'),
       'el_relIso_fall17'         : cms.InputTag('isoForEleFall17:PFIsoAll'),
+      'el_PFelIso04_Summer16'         : cms.InputTag('isoForEleSummer16:PFIsoAll04'),
       'el_ptRatio'               : cms.InputTag('ptRatioRelForEle:ptRatio'),
       'el_ptRel'                 : cms.InputTag('ptRatioRelForEle:ptRel'),
-      'el_closestJetDeepFlavour' : cms.InputTag('leptonMvaTOP:closestJetDeepFlavour'), # For those crazy people who want to add even more cuts on top of their leptonMva but can't tell why they need it
-      'el_closestJetDeepCsv'     : cms.InputTag('leptonMvaTOP:closestJetDeepCsv'),
+      'el_closestJetDeepFlavour' : cms.InputTag('leptonMvaTTH:closestJetDeepFlavour'), # For those crazy people who want to add even more cuts on top of their leptonMva but can't tell why they need it
+      'el_closestJetpt'          : cms.InputTag('leptonMvaTTH:closestJetpt'),
+      'el_closestJeteta'         : cms.InputTag('leptonMvaTTH:closestJeteta'),
+      'el_jetNDauChargedMVASel'  : cms.InputTag('ptRatioRelForEle:jetNDauChargedMVASel'),
+      'el_mvas'                  : cms.InputTag('electronMVAValueMapProducer:ElectronMVAEstimatorRun2Fall17NoIsoV2Values'),
+
     }
     for i, j in newVariables.iteritems():
       setattr(tnpVars.CommonStuffForGsfElectronProbe.variables, i, j)

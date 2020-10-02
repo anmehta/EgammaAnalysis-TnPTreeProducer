@@ -5,9 +5,10 @@ import FWCore.ParameterSet.Config as cms
 def calibrateEGM(process, options ):
     
     ### apply 80X regression
-    from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
-    process = regressionWeights(process)
-
+    ##am    from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+    ##am process = regressionWeights(process)
+    #import EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi
+    #import RecoEgamma.EgammaTools.calibratedEgammas_cff
     process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
                                                        calibratedPatElectrons  = cms.PSet( initialSeed = cms.untracked.uint32(81),
                                                                                            engineName = cms.untracked.string('TRandom3'),                
@@ -16,16 +17,20 @@ def calibrateEGM(process, options ):
                                                                                            engineName = cms.untracked.string('TRandom3'),                
                                                                                            ),
                                                        )
-
-    process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
-    process.load('EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi')
-    process.load('EgammaAnalysis.ElectronTools.calibratedPatPhotonsRun2_cfi')
+    import EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi
+    #process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
+    #process.load('RecoEgamma.EgammaTools.calibratedEgammas_cfi')
+    import RecoEgamma.EgammaTools.calibratedEgammas_cff
+    process.load('EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi')
+    process.load('EgammaAnalysis.ElectronTools.calibratedPhotonsRun2_cfi')
 
     process.calibratedPatElectrons.electrons = cms.InputTag(options['ELECTRON_COLL'])
     process.calibratedPatPhotons.photons     = cms.InputTag(options['PHOTON_COLL']  )
+    process.calibratedPatElectrons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_Step2Closure_CoarseEtaR9Gain_v2")
+    process.calibratedPatPhotons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_Step2Closure_CoarseEtaR9Gain_v2")
     if options['isMC']:
         process.calibratedPatElectrons.isMC = cms.bool(True)
-        process.calibratedPatPhotons.isMC   = cms.bool(True)
+        process.calibratedPatPhotons.isMC   = cms.bool(False)
     else :
         process.calibratedPatElectrons.isMC = cms.bool(False)
         process.calibratedPatPhotons.isMC   = cms.bool(False)

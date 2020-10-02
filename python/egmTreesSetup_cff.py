@@ -152,7 +152,7 @@ def setSequences(process, options):
     process.init_sequence = cms.Sequence()
     if options['UseCalibEn']:
         process.enCalib_sequence = cms.Sequence(
-            process.regressionApplication  *
+            #process.calibratedEgammas  *
             process.calibratedPatElectrons *
             process.calibratedPatPhotons   *
             process.selectElectronsBase    *

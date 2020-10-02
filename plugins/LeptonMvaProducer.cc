@@ -70,6 +70,9 @@ LeptonMvaProducer::LeptonMvaProducer(const edm::ParameterSet & iConfig) :
     produces<edm::ValueMap<float>>(leptonMvaType_);
     produces<edm::ValueMap<float>>("closestJetDeepCsv");
     produces<edm::ValueMap<float>>("closestJetDeepFlavour");
+    produces<edm::ValueMap<float>>("closestJetpt");
+    produces<edm::ValueMap<float>>("closestJeteta");
+
 }
 
 
@@ -78,15 +81,17 @@ LeptonMvaProducer::LeptonMvaProducer(const edm::ParameterSet & iConfig) :
  * Begin job: initialize the TMVA reader [variables are automatically read from xml]
  */
 void LeptonMvaProducer::beginJob(){
-  reader = new TMVA::Reader("!Color:!Silent");
-
+  //  std::cout<<"in the reader"<<std::endl;
+  reader = new TMVA::Reader( "!Color:!Silent" );
   std::ifstream file(weightFileName_);
+  std::cout<<"reading weights from "<<weightFileName_<<std::endl;
   std::string line;
   while (std::getline(file, line)){
     if(line.find("VarIndex") == std::string::npos) continue;
     std::size_t start = line.find("Expression=\"")+12;
     std::size_t end   = line.find("\" Label");
     std::string var   = line.substr(start, end-start);
+    std::cout<<"in the reader variable is "<<var<<std::endl;
     reader->AddVariable(var, &inputValues[var]);
   }
 
@@ -119,7 +124,8 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
   std::vector<float> leptonMvaValues;
   std::vector<float> closestJetDeepCsvValues;
   std::vector<float> closestJetDeepFlavourValues;
-
+  std::vector<float> closestJetpt;
+  std::vector<float> closestJeteta;
   size_t i = 0;
   for(const auto &probe: *probes){
     edm::RefToBase<reco::Candidate> pp = probes_view->refAt(i);
@@ -127,17 +133,26 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
 
     float deepFlavour = 0;
     float deepCsv = 0;
+    float jpt=0;
+    float jeta=0;
+
     if(((*closestJet)[pp]).isNonnull()){
       const pat::Jet* jet = reinterpret_cast<const pat::Jet*>(((*closestJet)[pp]).get());
+      if (jet->pt() > 15) { 
       float probb    = jet->bDiscriminator("pfDeepFlavourJetTags:probb");
       float probbb   = jet->bDiscriminator("pfDeepFlavourJetTags:probbb");
       float problepb = jet->bDiscriminator("pfDeepFlavourJetTags:problepb");
       deepFlavour    = std::isnan(probb+probbb+problepb) ? 0. :  std::max(probb+probbb+problepb, (float)0.);
+      jpt=jet->pt();
+      jeta=jet->eta();
 
       probb   = jet->bDiscriminator("pfDeepCSVJetTags:probb");
       probbb  = jet->bDiscriminator("pfDeepCSVJetTags:probbb");
       deepCsv = std::isnan(probb+probbb) ? 0. :  std::max(probb+probbb, (float)0.);
+      //std::cout<<"check this"<<jet->pt()<<"\t"<<pp->pt()<<"\t"<<deepFlavour<<std::endl;
+      }
     }
+
 
 
     // If you need a new leptonMvaType, you can implement the mapping of the variables here:
@@ -147,10 +162,11 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
       inputValues["LepGood_eta"]                  = pp->eta();
       inputValues["LepGood_jetNDauChargedMVASel"] = floats["jetNDauChargedMVASel"];
       inputValues["LepGood_miniRelIsoCharged"]    = floats["miniIsoChg"]/pp->pt();
+      //      std::cout<<deepFlavour<<"\t ptRel "<<floats["ptRel"]<<"\t miniIsoChg "<<floats["miniIsoChg"]/pp->pt()<<"\t pt "<<pp->pt() <<std::endl;
       inputValues["LepGood_miniRelIsoNeutral"]    = (floats["miniIsoAll"] - floats["miniIsoChg"])/pp->pt();
-      inputValues["LepGood_jetPtRelv2"]           = std::isnan(floats["ptRel"] ? (float)0. : floats["ptRel"]);
+      inputValues["LepGood_jetPtRelv2"]           = std::isnan(floats["ptRel"]) ? (float)0. : floats["ptRel"] ;
       inputValues["LepGood_jetDF"]                = deepFlavour;
-      inputValues["LepGood_jetPtRatio"]           = std::isnan(floats["ptRatio"]) ? 1.0/(1.0+floats["PFIsoAll04"]/pp->pt()) : std::min(floats["ptRatio"],(float)1.5);
+      inputValues["LepGood_jetPtRatio"]           = std::isnan(floats["ptRatio"]) ? (1.0/(1.0+floats["PFIsoAll04"]/pp->pt())) : std::min(floats["ptRatio"],(float)1.5);
       inputValues["LepGood_dxy"]                  = log(fabs(probe.dB(pat::Electron::PV2D)));
       inputValues["LepGood_sip3d"]                = fabs(probe.dB(pat::Electron::PV3D)/probe.edB(pat::Electron::PV3D));
       inputValues["LepGood_dz"]                   = log(fabs(probe.dB(pat::Electron::PVDZ)));
@@ -192,9 +208,12 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
 
 
     float leptonMva = reader->EvaluateMVA("BDTG method");
+    //std::cout<<"check this mva val"<<leptonMva<<std::endl;
     leptonMvaValues.push_back(leptonMva);
     closestJetDeepCsvValues.push_back(deepCsv);
     closestJetDeepFlavourValues.push_back(deepFlavour);
+    closestJetpt.push_back(jpt);
+    closestJeteta.push_back(jeta);
 
     if(debug_){
       for(auto& pair : inputValues) std::cout << std::left << std::setw(30) << pair.first << "\t" << pair.second << std::endl;
@@ -207,6 +226,10 @@ void LeptonMvaProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSe
   writeValueMap(iEvent, probes, leptonMvaValues, leptonMvaType_);
   writeValueMap(iEvent, probes, closestJetDeepCsvValues, "closestJetDeepCsv");
   writeValueMap(iEvent, probes, closestJetDeepFlavourValues, "closestJetDeepFlavour");
+  writeValueMap(iEvent, probes, closestJetpt, "closestJetpt");
+  writeValueMap(iEvent, probes, closestJeteta, "closestJeteta");
+
+
 }
 
 
