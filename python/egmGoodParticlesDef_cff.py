@@ -4,54 +4,41 @@ import FWCore.ParameterSet.Config as cms
 
 def calibrateEGM(process, options ):
     
-    ### apply 80X regression
-    ##am    from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
-    ##am process = regressionWeights(process)
-    #import EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi
-    #import RecoEgamma.EgammaTools.calibratedEgammas_cff
-    process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
-                                                       calibratedPatElectrons  = cms.PSet( initialSeed = cms.untracked.uint32(81),
-                                                                                           engineName = cms.untracked.string('TRandom3'),                
-                                                                                           ),
-                                                       calibratedPatPhotons    = cms.PSet( initialSeed = cms.untracked.uint32(81),
-                                                                                           engineName = cms.untracked.string('TRandom3'),                
-                                                                                           ),
-                                                       )
-    import EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi
-    #process.load('EgammaAnalysis.ElectronTools.regressionApplication_cff')
-    #process.load('RecoEgamma.EgammaTools.calibratedEgammas_cfi')
-    import RecoEgamma.EgammaTools.calibratedEgammas_cff
-    process.load('EgammaAnalysis.ElectronTools.calibratedPatElectrons_cfi')
+
+    process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
     process.load('EgammaAnalysis.ElectronTools.calibratedPhotonsRun2_cfi')
-
-    process.calibratedPatElectrons.electrons = cms.InputTag(options['ELECTRON_COLL'])
-    process.calibratedPatPhotons.photons     = cms.InputTag(options['PHOTON_COLL']  )
-    process.calibratedPatElectrons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_Step2Closure_CoarseEtaR9Gain_v2")
-    process.calibratedPatPhotons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_Step2Closure_CoarseEtaR9Gain_v2")
-    if options['isMC']:
-        process.calibratedPatElectrons.isMC = cms.bool(True)
-        process.calibratedPatPhotons.isMC   = cms.bool(False)
-    else :
-        process.calibratedPatElectrons.isMC = cms.bool(False)
-        process.calibratedPatPhotons.isMC   = cms.bool(False)
-
-
     
+    import EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi
+    import RecoEgamma.EgammaTools.calibratedEgammas_cff
+    process.load('RecoEgamma.EgammaTools.calibratedEgammas_cff')
+
+    process.calibratedPatElectrons.src = cms.InputTag(options['ELECTRON_COLL'])
+    process.calibratedPatElectrons.produceCalibratedObjs = cms.bool(False)
+    process.calibratedPatElectrons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Run2018_Step2Closure_CoarseEtaR9Gain_v2")
+
+    process.calibratedPatPhotons.src     = cms.InputTag(options['PHOTON_COLL']  )
+    process.calibratedPatPhotons.produceCalibratedObjs = cms.bool(False)
+    process.calibratedPatPhotons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/ScalesSmearings/Legacy2016_07Aug2017_FineEtaR9_v3_ele_unc")
+
     process.selectElectronsBase = cms.EDFilter("PATElectronSelector",
+                                               #src = cms.InputTag(options['ELECTRON_COLL']),
                                                src = cms.InputTag('calibratedPatElectrons'),
                                                cut = cms.string(  options['ELECTRON_CUTS']),
                                                )
 
     process.selectPhotonsBase   = cms.EDFilter("PATPhotonSelector",
+                                               #src = cms.InputTag(options['PHOTON_COLL']  ),
                                                src = cms.InputTag('calibratedPatPhotons' ),
                                                cut = cms.string(options['PHOTON_CUTS']),
                                                )
 
     ### change the input collection to be the calibrated energy one for all other modules from now on
-    options['ELECTRON_COLL'] = 'selectElectronsBase'
+    #options['ELECTRON_COLL'] =  "slimmedElectrons" #cms.InputTag(options['ELECTRON_COLL']) #'selectElectronsBase'
+    #options['PHOTON_COLL']   = "slimmedPhotons" #cms.InputTag(options['PHOTON_COLL']  ) #'selectPhotonsBase'
+    options['ELECTRON_COLL'] = 'selectElectronsBase' 
     options['PHOTON_COLL']   = 'selectPhotonsBase'
 
-
+        
 
 
 ###################################################################################
@@ -75,7 +62,7 @@ def setGoodParticlesMiniAOD(process, options):
                                           beamSpot         = cms.InputTag("offlineBeamSpot"),
                                           conversions      = cms.InputTag("reducedEgamma:reducedConversions"),
                                           pfCandidates     = cms.InputTag("packedPFCandidates"),
-                                          )
+                                      )
 
     ####################  Electron collection
     process.goodElectrons = cms.EDFilter("PATElectronRefSelector",

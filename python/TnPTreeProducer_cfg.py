@@ -24,7 +24,7 @@ registerOption('doEleID',     True,     'Include tree for electron ID SF')
 registerOption('doPhoID',     False,     'Include tree for photon ID SF')
 registerOption('doTrigger',   False,     'Include tree for trigger SF')
 registerOption('doRECO',      False,    'Include tree for Reco SF (requires AOD)')
-registerOption('calibEn',     True,    'Use EGM smearer to calibrate photon and electron energy')
+registerOption('calibEn',     False,    'Use EGM smearer to calibrate photon and electron energy')
 registerOption('includeSUSY', False,    'Add also the variables used by SUSY')
 
 registerOption('HLTname',     'HLT',    'HLT process name (default HLT)', optionType=VarParsing.varType.string) # HLTname was HLT2 in now outdated reHLT samples
@@ -73,12 +73,12 @@ options['ELECTRON_COLL']        = "gedGsfElectrons" if options['useAOD'] else "s
 options['PHOTON_COLL']          = "gedPhotons" if options['useAOD'] else "slimmedPhotons"
 options['SUPERCLUSTER_COLL']    = "reducedEgamma:reducedSuperClusters" ### not used in AOD
 
-options['ELECTRON_CUTS']        = "" #ecalEnergy*sin(superClusterPosition.theta)>5.0 &&  (abs(-log(tan(superClusterPosition.theta/2)))<2.5)"
-options['SUPERCLUSTER_CUTS']    = "" #abs(eta)<2.5 &&  et>5.0"
+options['ELECTRON_CUTS']        = "ecalEnergy*sin(superClusterPosition.theta)>5.0 &&  (abs(-log(tan(superClusterPosition.theta/2)))<2.5)"
+options['SUPERCLUSTER_CUTS']    = "abs(eta)<2.5 &&  et>5.0"
 options['PHOTON_CUTS']          = "(abs(-log(tan(superCluster.position.theta/2)))<=2.5) && pt> 10"
-options['ELECTRON_TAG_CUTS']    = "" #(abs(-log(tan(superCluster.position.theta/2)))<=2.1) && !(1.4442<=abs(-log(tan(superClusterPosition.theta/2)))<=1.566) && pt >= 30.0"
+options['ELECTRON_TAG_CUTS']    = "(abs(-log(tan(superCluster.position.theta/2)))<=2.1) && !(1.4442<=abs(-log(tan(superClusterPosition.theta/2)))<=1.566) && pt >= 30.0"
 
-options['MAXEVENTS']            = cms.untracked.int32(20)#varOptions.maxEvents)
+options['MAXEVENTS']            = cms.untracked.int32(200)#varOptions.maxEvents)
 options['DoTrigger']            = varOptions.doTrigger
 options['DoRECO']               = varOptions.doRECO
 options['DoEleID']              = varOptions.doEleID
@@ -96,7 +96,7 @@ options['OUTPUT_FILE_NAME']     = "TnPTree_%s.root" % ("mc" if options['isMC'] e
 #################################################
 if varOptions.GT == "auto":
   if options['isMC']:
-    if options['era'] == '2016':   options['GLOBALTAG'] = '102X_mcRun2_asymptotic_v8' #94X_mcRun2_asymptotic_v3'
+    if options['era'] == '2016':   options['GLOBALTAG'] = '94X_mcRun2_asymptotic_v3' #102X_mcRun2_asymptotic_v8'
     if options['era'] == '2017':   options['GLOBALTAG'] = '94X_mc2017_realistic_v17'
     if options['era'] == '2018':   options['GLOBALTAG'] = '102X_upgrade2018_realistic_v21'
     if options['era'] == 'UL2017': options['GLOBALTAG'] = '106X_dataRun2_v28'

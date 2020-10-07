@@ -154,7 +154,7 @@ def setSequences(process, options):
         process.enCalib_sequence = cms.Sequence(
             #process.calibratedEgammas  *
             process.calibratedPatElectrons *
-            process.calibratedPatPhotons   *
+            process.calibratedPatPhotons    *
             process.selectElectronsBase    *
             process.selectPhotonsBase
             )
