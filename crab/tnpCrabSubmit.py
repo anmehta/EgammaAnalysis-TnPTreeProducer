@@ -4,12 +4,12 @@ import os
 #
 # Example script to submit TnPTreeProducer to crab
 #
-submitVersion = "2020-06-09" # add some date here
+submitVersion = "07Oct2020" # add some date here
 doL1matching  = False
 
-defaultArgs   = ['doEleID=True','doPhoID=True','doTrigger=True']
-mainOutputDir = '/store/group/phys_egamma/tnpTuples/%s/%s' % (os.environ['USER'], submitVersion)
-
+defaultArgs   = ['doEleID=True','doPhoID=False','doTrigger=False']
+#mainOutputDir = '/store/group/phys_egamma/tnpTuples/%s/%s' % (os.environ['USER'], submitVersion)
+mainOutputDir = '/store/group/cmst3/group/dpsww/tnpTuples/%s/' %submitVersion
 # Logging the current version of TnpTreeProducer here, such that you can find back what the actual code looked like when you were submitting
 os.system('mkdir -p /eos/cms/%s' % mainOutputDir)
 os.system('(git log -n 1;git diff) &> /eos/cms/%s/git.log' % mainOutputDir)
